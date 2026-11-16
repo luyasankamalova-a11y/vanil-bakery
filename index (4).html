@@ -1,0 +1,523 @@
+<title>Ваниль — концепт сайта кондитерской</title>
+<meta name="description" content="Демонстрационный концепт сайта кондитерской студии Ваниль с каталогом тортов и интерактивным расчётом заказа.">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600&family=Montserrat:wght@400;500;600&family=Great+Vibes&display=swap">
+<style>
+/* Layout: белая воздушная витрина; тонкий заголовок и 3D-торт по центру первого экрана, рукописные заголовки разделов, номера разделов слева. Одна светлая тема намеренно. */
+:root{
+  --bg:#FFFFFF; --mist:#EDF0F4; --ink:#2B2B2E; --muted:#7B7B82; --line:#E5E6EA;
+  --caramel:#B5683D; --caramel-d:#97522C; --tg:#EEF3F8; --tg-ink:#1F3446;
+  --display:"Comfortaa","Trebuchet MS",sans-serif; --body:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif; --script:"Great Vibes","Segoe Script",cursive;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font:15px/1.7 var(--body)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h3{font-family:var(--display);font-weight:300;margin:0;line-height:1.15;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+.cap{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+.muted{color:var(--muted)}
+.script-h{font:400 clamp(52px,7vw,84px)/1 var(--script);color:var(--ink);margin:0;text-align:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:42px;padding:0 24px;border-radius:999px;font:600 11px var(--body);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.btn.solid{background:var(--caramel);color:#fff}
+.btn.solid:hover{background:var(--caramel-d)}
+.btn.line{border-color:var(--ink);color:var(--ink);background:transparent}
+.btn.line:hover{background:var(--ink);color:#fff}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--caramel);outline-offset:3px}
+
+/* Шапка */
+header{position:relative;z-index:5;background:var(--bg)}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:14px}
+.logo{display:grid;justify-items:center;line-height:1;text-decoration:none}
+.logo b{font:400 26px/1 var(--script)}
+.logo small{font:600 8px var(--body);letter-spacing:.28em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.nav ul{display:flex;gap:28px;list-style:none;margin:0;padding:0;font-size:13px}
+.nav ul a{text-decoration:none;padding-bottom:3px;border-bottom:1px solid transparent}
+.nav ul a:hover,.nav ul a.on{border-color:var(--ink)}
+
+/* Первый экран */
+.hero{position:relative;background:linear-gradient(180deg,var(--mist) 0%,#F7F8FA 100%);overflow:hidden}
+.hero .inner{position:relative;height:min(680px,calc(100svh - 82px));min-height:560px}
+.hero-text{position:relative;z-index:3;text-align:center;padding-top:42px;display:grid;justify-items:center;gap:10px}
+.hero-text h1{font-size:clamp(46px,6.4vw,76px);letter-spacing:-.01em}
+.hero-text .sub{font:400 clamp(24px,2.6vw,30px)/1.2 var(--script);color:var(--muted)}
+.hero-text .btn{margin-top:14px}
+#stage{position:absolute;left:0;right:0;bottom:0;top:148px;z-index:2;pointer-events:none}
+#stage canvas{display:block;width:100%;height:100%}
+.social{position:absolute;right:0;bottom:40%;z-index:3;display:grid;gap:10px}
+.social a{width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:600 9px var(--body);text-decoration:none;letter-spacing:.04em}
+
+/* Ветки гипсофилы */
+.sprig{position:absolute;pointer-events:none;z-index:1}
+
+/* Ассортимент */
+section{padding-block:84px;position:relative}
+.assort-top{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:16px;margin-bottom:34px}
+.assort-top .arrows{justify-self:end;display:flex;gap:6px}
+.arrows button{width:34px;height:34px;border:1px solid var(--ink);background:var(--bg);border-radius:4px;cursor:pointer;font-size:14px;color:var(--ink)}
+.arrows button:hover{background:var(--ink);color:#fff}
+.track{display:grid;grid-auto-flow:column;grid-auto-columns:calc((100% - 3*18px)/4);gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:6px}
+.track::-webkit-scrollbar{display:none}
+.card{scroll-snap-align:start;display:grid;grid-template-rows:auto auto;text-decoration:none;cursor:pointer;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:center}
+.card .pic{aspect-ratio:3/4;max-width:100%;background:var(--tint);display:grid;place-items:center;overflow:hidden;position:relative}
+.card .pic img{width:100%;max-width:100%;transition:transform .6s ease}
+.card:hover .pic img{transform:scale(1.05)}
+.card .lab{border:1px solid var(--line);border-top:0;padding:14px 10px;display:grid;gap:2px}
+.card .lab b{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
+.card .lab span{font-size:13px;color:var(--muted)}
+.dots{display:flex;justify-content:center;gap:8px;margin-top:26px}
+.dots i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.dots i.on{background:var(--ink)}
+
+/* О нас */
+.about .wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.about .wrap>*{min-width:0}
+.about-text{display:grid;gap:14px;max-width:380px;justify-self:center}
+.about-text .script-h{text-align:left}
+.about-text p{color:#55555B}
+.about-text a{color:var(--caramel);font-size:13px;font-weight:600;text-decoration:none;border-bottom:1px solid currentColor;justify-self:start}
+.mosaic{display:grid;grid-template-columns:1fr 1.1fr;grid-template-rows:1fr 1fr;gap:14px;height:440px}
+.tile{background:var(--tint);display:grid;place-items:center;overflow:hidden;position:relative}
+.tile img{width:100%;height:100%;max-width:100%;object-fit:contain}
+.tile.tall{grid-row:span 2}
+.tile .tag{position:absolute;left:12px;bottom:10px;font:400 22px/1 var(--script);color:var(--fg,var(--ink))}
+.berries-deco{display:block;width:120px;max-width:100%;margin-bottom:-6px}
+
+/* Заказ */
+.order{background:#FAFAFB;border-block:1px solid var(--line)}
+.order .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:start;margin-top:36px}
+.order .grid>*{min-width:0}
+form{display:grid;gap:22px}
+.pick{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.pick input{position:absolute;opacity:0;pointer-events:none}
+.pick label{display:grid;gap:6px;justify-items:center;padding:0 0 10px;border:1px solid var(--line);cursor:pointer;background:var(--bg);text-align:center;font-size:12px;line-height:1.3;overflow:hidden}
+.pick label .p{width:100%;aspect-ratio:1/1;background:var(--tint);display:grid;place-items:center;overflow:hidden}
+.pick label img{width:100%;max-width:100%}
+.pick input:checked+label{border-color:var(--caramel);box-shadow:inset 0 0 0 1px var(--caramel)}
+.pick input:focus-visible+label{outline:2px solid var(--caramel);outline-offset:2px}
+.field{display:grid;gap:8px}
+.field>span,.legend{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+select,input[type=date],input[type=text],input[type=tel]{width:100%;min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:2px;background:var(--bg);color:var(--ink);font:15px var(--body)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row>*{min-width:0}
+.extras{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px}
+.extras label{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer}
+.extras input{width:17px;height:17px;accent-color:var(--caramel)}
+.extras em{font-style:normal;color:var(--muted);margin-left:auto;font-size:13px}
+.total{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:20px;border-top:1px solid var(--line)}
+.total b{font:300 38px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.total small{display:block;color:var(--muted);font-size:13px}
+.done{display:grid;gap:14px;padding:32px;background:var(--bg);border:1px solid var(--line)}
+.done .script-h{text-align:left;font-size:56px}
+.done h3{font-size:28px}
+.done p{color:var(--muted)}
+
+.tg{position:sticky;top:calc(20px + env(safe-area-inset-top,0px));background:var(--bg);border:1px solid var(--line);border-radius:22px;padding:18px;display:grid;gap:14px}
+.tg-top{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.tg-ava{width:40px;height:40px;border-radius:50%;background:var(--caramel);color:#fff;display:grid;place-items:center;font:400 22px var(--script)}
+.tg-top b{display:block;font-size:14px}
+.tg-top span{font-size:12px;color:var(--muted)}
+.bubble{background:var(--tg);color:var(--tg-ink);border-radius:16px 16px 16px 4px;padding:14px 16px;font-size:14px;line-height:1.6;white-space:pre-line;overflow-wrap:anywhere}
+.bubble .time{display:block;text-align:right;font-size:11px;opacity:.55;margin-top:4px}
+.kb{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.kb span{background:var(--tg);color:var(--tg-ink);border-radius:8px;text-align:center;padding:9px 6px;font-size:12px;font-weight:600}
+.tg .note{font-size:12px;color:var(--muted)}
+
+/* Как заказать */
+.steps{list-style:none;margin:40px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:40px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;gap:8px;justify-items:center;text-align:center}
+.steps li::before{content:"0" counter(s);font:300 15px var(--display);width:46px;height:46px;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center}
+.steps h3{font-size:21px;font-weight:400}
+.steps p{color:var(--muted);max-width:26em}
+
+footer{background:var(--mist)}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;padding-block:30px 100px;font-size:13px;color:var(--muted)}
+
+@media (max-width:900px){
+  .nav ul{display:none}
+  .hero .inner{height:590px;min-height:0}
+  .hero-text{padding-top:38px}
+  #stage{top:165px}
+  .social{display:none}
+  .track{grid-auto-columns:calc((100% - 18px)/2)}
+  .about .wrap,.order .grid{grid-template-columns:1fr}
+  .tg{position:static}
+  .steps{grid-template-columns:1fr;gap:28px}
+  .sprig{display:none}
+}
+@media (max-width:520px){
+  section{padding-block:60px}
+  .hero .inner{height:560px}
+  .hero-text{padding-top:30px}
+  .track{grid-auto-columns:72%}
+  .assort-top{grid-template-columns:1fr auto}
+  .assort-top>span{display:none}
+  .assort-top .script-h{text-align:left}
+  .pick{grid-template-columns:1fr 1fr}
+  .row,.extras{grid-template-columns:1fr}
+  .mosaic{height:360px}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+
+<header><div class="wrap nav">
+  <a class="logo" href="#top"><b data-brand>Ваниль</b><small>кондитерская</small></a>
+  <ul id="menu"><li><a href="#assort">Ассортимент</a></li><li><a href="#about">О нас</a></li><li><a href="#order">Заказ</a></li><li><a href="#how">Доставка</a></li><li><a href="#contacts">Контакты</a></li></ul>
+</div></header>
+
+<main>
+<section class="hero" id="top" style="padding:0"><div class="wrap inner">
+  <div class="hero-text">
+    <h1 data-brand>Ваниль</h1>
+    <div class="sub">« превращаем торт в искусство »</div>
+    <a class="btn solid" href="#order">Выбрать торт</a>
+  </div>
+  <div id="stage" aria-hidden="true"></div>
+  <div class="social" aria-hidden="true"></div>
+</div></section>
+
+<section id="assort">
+  <svg class="sprig" style="left:0;top:20px;width:150px" viewBox="0 0 150 200" aria-hidden="true"><g fill="none" stroke="#9AA58A" stroke-width="1.2"><path d="M10 200 C40 150 60 110 70 40"/><path d="M48 120 C70 100 90 95 110 70"/><path d="M60 80 C40 60 30 40 25 20"/><path d="M70 40 C85 30 95 20 100 8"/></g><g fill="#F3E4E7" stroke="#D9B3BA" stroke-width=".8"><circle cx="70" cy="38" r="4"/><circle cx="100" cy="8" r="4"/><circle cx="110" cy="70" r="5"/><circle cx="25" cy="20" r="4"/><circle cx="92" cy="80" r="3.5"/><circle cx="36" cy="44" r="3"/><circle cx="118" cy="62" r="3"/></g></svg>
+  <svg class="sprig" style="right:0;top:10px;width:120px" viewBox="0 0 140 180" aria-hidden="true"><g fill="none" stroke="#9AA58A" stroke-width="1.2"><path d="M140 180 C110 140 90 100 80 30"/><path d="M98 110 C80 90 60 85 40 64"/><path d="M84 60 C100 45 112 30 118 12"/></g><g fill="#B83A55"><circle cx="80" cy="28" r="3.5"/><circle cx="40" cy="62" r="4"/><circle cx="118" cy="12" r="3.5"/><circle cx="52" cy="76" r="3"/></g><g fill="#fff" stroke="#E2D6D8" stroke-width=".8"><circle cx="70" cy="40" r="3"/><circle cx="106" cy="30" r="3"/><circle cx="30" cy="56" r="3"/></g></svg>
+  <div class="wrap">
+    <div class="assort-top">
+      <span></span>
+      <h2 class="script-h">Ассортимент</h2>
+      <div class="arrows"><button type="button" id="prev" aria-label="Назад">‹</button><button type="button" id="next" aria-label="Вперёд">›</button></div>
+    </div>
+    <div class="track" id="track"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+</section>
+
+<section class="about" id="about" style="background:#FAFAFB"><div class="wrap">
+  <div class="about-text">
+    <img class="berries-deco" id="berriesDeco" alt="">
+    <h2 class="script-h">О нас</h2>
+    <div class="cap">Как мы работаем</div>
+    <p>Торт — это главный момент праздника. Его ждут и дети, и взрослые, поэтому мы не торопимся.</p>
+    <p>Печём только из натуральных продуктов: сливки 33%, бельгийский шоколад, свежие ягоды. Бисквит отдыхает ночь, чтобы пропитаться.</p>
+    <p>Дизайн, цвета и надпись продумываем вместе с вами, а потом собираем торт к нужному дню.</p>
+    <a href="#order">Собрать свой торт</a>
+  </div>
+  <div class="mosaic">
+    <div class="tile" style="--tint:#F4DDE2"><img id="m1" alt="Макаруны"><span class="tag">макаруны</span></div>
+    <div class="tile tall" style="--tint:#1F1C1B;--fg:#F3E9DF"><img id="m2" alt="Шоколадный торт"><span class="tag">шоколад</span></div>
+    <div class="tile" style="--tint:#EEE9E2"><img id="m3" alt="Ягоды"><span class="tag">ягоды</span></div>
+  </div>
+</div></section>
+
+<section class="order" id="order"><div class="wrap">
+  <h2 class="script-h">Заказ торта</h2>
+  <p class="muted" style="text-align:center;margin-top:10px">Соберите торт сами, стоимость видно сразу</p>
+  <div class="grid">
+    <div>
+      <form id="form">
+        <div class="field"><span class="legend">Торт</span><div class="pick" id="pick"></div></div>
+        <div class="row">
+          <label class="field" for="size"><span>Вес</span><select id="size"></select></label>
+          <label class="field" for="date"><span>К какому дню</span><input type="date" id="date" required aria-required="true"></label>
+        </div>
+        <label class="field" for="text"><span>Надпись на торте</span><input type="text" id="text" maxlength="40" placeholder="Например, С днём рождения!"></label>
+        <div class="field"><span class="legend">Добавить</span>
+          <div class="extras">
+            <label for="x1"><input type="checkbox" id="x1" data-p="450" data-n="свежие ягоды сверху" checked>Свежие ягоды сверху<em>+450 ₽</em></label>
+            <label for="x2"><input type="checkbox" id="x2" data-p="250" data-n="свечи-цифры">Свечи-цифры<em>+250 ₽</em></label>
+            <label for="x3"><input type="checkbox" id="x3" data-p="300" data-n="съедобное фото">Съедобное фото<em>+300 ₽</em></label>
+            <label for="x4"><input type="checkbox" id="x4" data-p="500" data-n="доставка по городу">Доставка по городу<em>+500 ₽</em></label>
+          </div>
+        </div>
+        <div class="row">
+          <label class="field" for="who"><span>Ваше имя</span><input type="text" id="who" maxlength="30" placeholder="Как к вам обращаться" autocomplete="name" required aria-required="true"></label>
+          <label class="field" for="phone"><span>Телефон</span><input type="tel" id="phone" maxlength="18" placeholder="Ваш номер телефона" autocomplete="tel" inputmode="tel" pattern="[+0-9()\s-]{10,18}" title="Введите номер телефона длиной от 10 до 18 символов" required aria-required="true"></label>
+        </div>
+        <div class="total">
+          <div><small>Итого</small><b id="sum">0 ₽</b><small id="pre"></small></div>
+          <button class="btn solid" type="submit">Проверить заказ</button>
+        </div>
+      </form>
+      <div class="done" id="done" hidden>
+        <div class="script-h">Спасибо!</div>
+        <h3>Демонстрация завершена</h3>
+        <p>Вы посмотрели сценарий оформления заказа. Данные никуда не отправлялись.</p>
+        <p style="font-size:13px">Для реального запуска потребуется подключить обработчик заявок и настроить уведомления.</p>
+        <button class="btn line" type="button" id="again" style="justify-self:start">Собрать ещё один</button>
+      </div>
+    </div>
+    <aside class="tg" aria-live="polite">
+      <div class="tg-top"><div class="tg-ava" data-initial>В</div><div><b><span data-brand>Ваниль</span>: заказы</b><span>пример интерфейса уведомления</span></div></div>
+      <div class="bubble" id="bubble"></div>
+      <div class="kb"><span>Принять заказ</span><span>Написать покупателю</span></div>
+      <p class="note">Так может выглядеть уведомление о заказе после подключения реальной интеграции. Сейчас это только визуальная демонстрация.</p>
+    </aside>
+  </div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <h2 class="script-h">Доставка</h2>
+  <ol class="steps">
+    <li><h3>Соберите торт</h3><p>Выберите торт, вес, дату и надпись. Заказываем минимум за 2 дня.</p></li>
+    <li><h3>Мы подтвердим</h3><p>Кондитер напишет в течение часа и пришлёт ссылку на предоплату 50%.</p></li>
+    <li><h3>Заберите или ждите курьера</h3><p>Накануне напомним о заказе. Самовывоз бесплатно, доставка по городу 500 ₽.</p></li>
+  </ol>
+</div></section>
+</main>
+
+<footer id="contacts"><div class="wrap">
+  <a class="logo" href="#top"><b data-brand>Ваниль</b><small>кондитерская</small></a>
+  <span>Концепт сайта кондитерской студии · демонстрационный проект</span>
+</div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ---------- Данные ---------- */
+const CAKES=[
+  {id:'pist',name:'Фисташка и малина',kg:2900,sizes:[1.5,2,3],tint:'#E2E8DA'},
+  {id:'choc',name:'Шоколад и вишня',kg:2600,sizes:[1.5,2,3],tint:'#1F1C1B'},
+  {id:'velvet',name:'Красный бархат',kg:2500,sizes:[3,4,5],tint:'#F4DDE2'},
+  {id:'bento',name:'Ягодный бенто',fixed:1900,sizes:[0.5],tint:'#EEE9E2'},
+  {id:'blue',name:'Черничный чизкейк',kg:2700,sizes:[1.5,2],tint:'#E3E8F0'}
+];
+const rub=n=>n.toLocaleString('ru-RU')+' ₽';
+const $=id=>document.getElementById(id);
+const pics={};
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- 3D ---------- */
+if(window.THREE){try{
+  const C=h=>new THREE.Color(h).convertSRGBToLinear();
+  const M=(hex,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:C(hex),roughness:.6,metalness:0},o));
+  const lathe=(pts,seg=96)=>new THREE.LatheGeometry(pts.map(p=>new THREE.Vector2(p[0],p[1])),seg);
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+
+  function tierGeo(r,h,b=.07){
+    const p=[[0,0],[r-b,0]];
+    for(let i=1;i<=6;i++){const a=-Math.PI/2+i/6*Math.PI/2;p.push([r-b+Math.cos(a)*b,b+Math.sin(a)*b])}
+    for(let i=0;i<=6;i++){const a=i/6*Math.PI/2;p.push([r-b+Math.cos(a)*b,h-b+Math.sin(a)*b])}
+    p.push([0,h]);return lathe(p);
+  }
+  const rosGeo=(()=>{const g=new THREE.ConeGeometry(.5,1,64,28);g.translate(0,.5,0);const a=g.attributes.position;
+    for(let i=0;i<a.count;i++){const x=a.getX(i),y=a.getY(i),z=a.getZ(i);if(Math.hypot(x,z)<1e-4)continue;
+      const t=Math.atan2(z,x);const R=.5*Math.pow(Math.max(0,1-y),.62)*(1+.2*Math.cos(8*t+y*7));a.setXYZ(i,Math.cos(t)*R,y,Math.sin(t)*R)}
+    g.computeVertexNormals();return g})();
+  const raspGeo=(()=>{const g=new THREE.IcosahedronGeometry(1,4);const a=g.attributes.position;
+    for(let i=0;i<a.count;i++){const v=new THREE.Vector3(a.getX(i),a.getY(i),a.getZ(i)).normalize();
+      const n=Math.abs(Math.sin(v.x*9)*Math.sin(v.y*9+1)*Math.sin(v.z*9+2));v.multiplyScalar(1+.12*n);v.y*=1.18;a.setXYZ(i,v.x,v.y,v.z)}
+    g.computeVertexNormals();return g})();
+  const blueGeo=(()=>{const g=new THREE.SphereGeometry(1,40,28);const a=g.attributes.position;
+    for(let i=0;i<a.count;i++){const y=a.getY(i);if(y>.82){const k=(y-.82)*1.6;a.setY(i,y-k*.5)}}
+    g.computeVertexNormals();g.scale(1,.86,1);return g})();
+  const sphereGeo=new THREE.SphereGeometry(1,32,24);
+  const crumbGeo=new THREE.DodecahedronGeometry(1,0);
+  const leafGeos=[0,1,2].map(()=>{const g=new THREE.PlaneGeometry(.16,.11,4,3);const a=g.attributes.position;
+    for(let i=0;i<a.count;i++)a.setZ(i,rnd(-.02,.02));g.computeVertexNormals();return g});
+  const shellGeo=lathe([[0,0],[.42,0],[.5,.04],[.48,.12],[.36,.2],[0,.23]],48);
+
+  const mats={
+    rasp:M('#C42445',{roughness:.45}),
+    blue:new THREE.MeshPhysicalMaterial({color:C('#3B4675'),roughness:.42,clearcoat:.3}),
+    cherry:new THREE.MeshPhysicalMaterial({color:C('#8C0E22'),roughness:.15,clearcoat:1}),
+    stem:M('#4E5B2A'),gold:M('#D9AE52',{metalness:1,roughness:.28,side:THREE.DoubleSide}),pist:M('#8EA04C',{roughness:.7}),
+    white:M('#F7F1E8',{roughness:.7}),plate:new THREE.MeshPhysicalMaterial({color:C('#FFFFFF'),roughness:.2,clearcoat:.6}),
+    shard:M('#3A2216',{roughness:.35}),redCrumb:M('#9E2234',{roughness:.9}),biscuit:M('#D9B27C',{roughness:.85})
+  };
+  const mesh=(g,m,s=1)=>{const o=new THREE.Mesh(g,m);o.scale.setScalar(s);return o};
+  const rasp=s=>mesh(raspGeo,mats.rasp,s);
+  const blue=s=>{const o=mesh(blueGeo,mats.blue,s);o.rotation.set(rnd(-.3,.3),rnd(0,6),rnd(-.3,.3));return o};
+  function cherry(s){const g=new THREE.Group();g.add(mesh(sphereGeo,mats.cherry,s));
+    const c=new THREE.QuadraticBezierCurve3(new THREE.Vector3(0,s*.9,0),new THREE.Vector3(s*.3,s*2,0),new THREE.Vector3(s*.9,s*2.6,0));
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(c,12,s*.07,6),mats.stem));return g}
+  function rosette(s,mat){const o=new THREE.Mesh(rosGeo,mat);o.scale.set(s,s*1.15,s);o.rotation.y=rnd(0,6);return o}
+  function leaf(){const o=new THREE.Mesh(leafGeos[Math.floor(rnd(0,3))],mats.gold);o.rotation.set(rnd(-1.2,-.3),rnd(0,6),rnd(-.4,.4));return o}
+  function crumbs(n,mat,place,size=.028){const im=new THREE.InstancedMesh(crumbGeo,mat,n);const d=new THREE.Object3D();
+    for(let i=0;i<n;i++){place(d.position);d.rotation.set(rnd(0,6),rnd(0,6),rnd(0,6));d.scale.setScalar(size*rnd(.6,1.3));d.updateMatrix();im.setMatrixAt(i,d.matrix)}return im}
+  function macaron(hex){const g=new THREE.Group();const m=M(hex,{roughness:.55});
+    const top=new THREE.Mesh(shellGeo,m);top.position.y=.09;g.add(top);
+    const bot=new THREE.Mesh(shellGeo,m);bot.rotation.x=Math.PI;bot.position.y=-.09;g.add(bot);
+    g.add(new THREE.Mesh(new THREE.CylinderGeometry(.43,.43,.18,40),mats.white));return g}
+  function drip(g,r,h,mat){
+    g.add(new THREE.Mesh(lathe([[r+.028,h-.07],[r+.03,h-.01],[r+.01,h+.025],[r*.7,h+.035],[0,h+.04]]),mat));
+    const cyl=new THREE.CylinderGeometry(.04,.04,1,12);
+    for(let i=0;i<26;i++){const a=i/26*Math.PI*2+rnd(-.06,.06),L=rnd(.08,.38)*h;
+      const c=new THREE.Mesh(cyl,mat);c.scale.y=L;c.position.set(Math.cos(a)*(r+.018),h-.04-L/2,Math.sin(a)*(r+.018));g.add(c);
+      const b=mesh(sphereGeo,mat,.046);b.position.set(Math.cos(a)*(r+.02),h-.04-L,Math.sin(a)*(r+.02));g.add(b)}
+  }
+  const ring=(n,R,y,fn,off=0)=>{const out=[];for(let i=0;i<n;i++){const a=i/n*Math.PI*2+off;const o=fn(i);o.position.set(Math.cos(a)*R,y,Math.sin(a)*R);out.push(o)}return out};
+  const pile=(g,n,R,y,fn)=>{for(let i=0;i<n;i++){const a=rnd(0,6.28),r=Math.sqrt(Math.random())*R;const o=fn();o.position.set(Math.cos(a)*r,y+rnd(0,.08)+(r<R*.4?.07:0),Math.sin(a)*r);g.add(o)}};
+
+  const BUILD={
+    blue(){const g=new THREE.Group(),h=.85;
+      const base=new THREE.Mesh(tierGeo(1,.16,.03),mats.biscuit);g.add(base);
+      const t=new THREE.Mesh(tierGeo(.99,h-.16),M('#F4EEE6',{roughness:.75}));t.position.y=.16;g.add(t);
+      g.add(new THREE.Mesh(lathe([[1.0,h-.02],[1.0,h+.02],[.85,h+.04],[0,h+.045]]),new THREE.MeshPhysicalMaterial({color:C('#4A2E5C'),roughness:.15,clearcoat:1})));
+      pile(g,26,.78,h+.1,()=>blue(rnd(.07,.095)));
+      for(let i=0;i<4;i++){const l=leaf();l.position.set(rnd(-.4,.4),h+.2,rnd(-.4,.4));g.add(l)}
+      return g},
+    pist(){const g=new THREE.Group(),h=.9;
+      g.add(new THREE.Mesh(tierGeo(1,h),M('#B9C68D',{roughness:.75})));
+      ring(8,.78,h,()=>rosette(.2,mats.white)).forEach(o=>g.add(o));
+      ring(8,.78,h,()=>rasp(.085),Math.PI/8).forEach(o=>{o.position.y=h+.06;g.add(o)});
+      [[0,0],[.18,.1],[-.15,.14],[.05,-.2],[-.1,-.1]].forEach(([x,z],i)=>{const o=rasp(.1);o.position.set(x,h+.11+(i===0?.1:0),z);o.rotation.z=rnd(-.4,.4);g.add(o)});
+      g.add(crumbs(60,mats.pist,p=>{const a=rnd(0,6.28),r=Math.sqrt(Math.random())*.6;p.set(Math.cos(a)*r,h+.015,Math.sin(a)*r)}));
+      g.add(crumbs(70,mats.pist,p=>{const a=rnd(0,6.28);p.set(Math.cos(a),rnd(.02,.16),Math.sin(a))},.032));
+      for(let i=0;i<5;i++){const l=leaf();const a=rnd(0,6.28);l.position.set(Math.cos(a)*rnd(.2,.5),h+.12,Math.sin(a)*rnd(.2,.5));g.add(l)}
+      return g},
+    choc(){const g=new THREE.Group(),h=1;
+      g.add(new THREE.Mesh(tierGeo(1,h),M('#5A3527',{roughness:.8})));
+      drip(g,1,h,new THREE.MeshPhysicalMaterial({color:C('#2A140C'),roughness:.12,clearcoat:1}));
+      ring(6,.68,h+.04,()=>rosette(.24,M('#6B4030',{roughness:.6}))).forEach(o=>g.add(o));
+      ring(4,.68,h+.32,()=>cherry(.11),.3).forEach(o=>g.add(o));
+      for(let i=0;i<3;i++){const s=new THREE.Mesh(new THREE.CylinderGeometry(.26,.26,.02,3),mats.shard);s.position.set(rnd(-.2,.2),h+.25,rnd(-.2,.2));s.rotation.set(rnd(-1.4,-.8),rnd(0,6),rnd(-.3,.3));g.add(s)}
+      for(let i=0;i<4;i++){const l=leaf();l.position.set(rnd(-.4,.4),h+.1,rnd(-.4,.4));g.add(l)}
+      return g},
+    velvet(){const g=new THREE.Group(),h1=.75,h2=.6;const cream=M('#F4EEE6',{roughness:.8});
+      g.add(new THREE.Mesh(tierGeo(1,h1),cream));
+      const t=new THREE.Mesh(tierGeo(.66,h2),cream);t.position.y=h1;g.add(t);
+      g.add(crumbs(170,mats.redCrumb,p=>{const a=rnd(0,6.28);p.set(Math.cos(a),rnd(.01,.22),Math.sin(a))}));
+      g.add(crumbs(90,mats.redCrumb,p=>{const a=rnd(0,6.28);p.set(Math.cos(a)*.665,h1+rnd(.01,.14),Math.sin(a)*.665)}));
+      ring(12,.86,h1,()=>rosette(.13,mats.white)).forEach(o=>g.add(o));
+      const top=h1+h2;
+      ring(7,.48,top,()=>rosette(.17,mats.white)).forEach(o=>g.add(o));
+      ring(7,.48,top,()=>rasp(.075),.45).forEach(o=>{o.position.y=top+.05;g.add(o)});
+      return g},
+    bento(){const g=new THREE.Group(),h=.55,r=.8;
+      g.add(new THREE.Mesh(tierGeo(r,h,.06),M('#EDB4C0',{roughness:.75})));
+      ring(18,r-.06,h,()=>rosette(.1,mats.white)).forEach(o=>g.add(o));
+      [[0,0],[.14,.08],[-.12,.1],[.04,-.15],[-.16,-.08],[.18,-.1]].forEach(([x,z])=>{const o=blue(.075);o.position.set(x,h+.06,z);g.add(o)});
+      const o=rasp(.09);o.position.set(.02,h+.18,.02);g.add(o);
+      return g},
+    macs(){const g=new THREE.Group();
+      [['#E8A3B2',0,0,0],['#BFCB8F',.05,.36,.02],['#F0DFC2',-.03,.72,-.02],['#E8A3B2',.02,1.08,0]].forEach(([c,x,y,z],i)=>{const m=macaron(c);m.position.set(x,y+.13,z);m.rotation.y=i;g.add(m)});
+      const m=macaron('#C9B7E0');m.position.set(.75,.13,.25);g.add(m);
+      const r=rasp(.13);r.position.set(-.55,.15,.35);g.add(r);
+      return g},
+    berries(){const g=new THREE.Group();
+      pile(g,16,.7,.08,()=>blue(rnd(.09,.12)));pile(g,7,.6,.12,()=>rasp(rnd(.1,.13)));
+      return g}
+  };
+
+  function makeEnv(renderer){
+    const s=new THREE.Scene();
+    s.add(new THREE.Mesh(new THREE.SphereGeometry(20,32,16),new THREE.MeshBasicMaterial({side:THREE.BackSide,color:C('#E6E9EE')})));
+    const light=(c,k,x,y,z,w,hh)=>{const p=new THREE.Mesh(new THREE.PlaneGeometry(w,hh),new THREE.MeshBasicMaterial({color:new THREE.Color(c).multiplyScalar(k),side:THREE.DoubleSide}));p.position.set(x,y,z);p.lookAt(0,0,0);s.add(p)};
+    light('#FFF8F0',6,-6,8,6,8,6);light('#FFFFFF',3,8,4,-4,6,6);light('#EAF0FF',1.6,0,-6,8,10,4);
+    const pm=new THREE.PMREMGenerator(renderer);const t=pm.fromScene(s,.03).texture;pm.dispose();return t;
+  }
+  function addLights(scene){
+    scene.add(new THREE.HemisphereLight(C('#FFFFFF'),C('#C8CCD4'),.5));
+    const d=new THREE.DirectionalLight(C('#FFF6EA'),1.3);d.position.set(-3,6,4);scene.add(d);
+  }
+  function setup(r){r.outputEncoding=THREE.sRGBEncoding;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05}
+
+  /* Снимки для карточек и мозаики */
+  const tr=new THREE.WebGLRenderer({antialias:true,alpha:true});setup(tr);tr.setSize(560,560,false);
+  const ts=new THREE.Scene();ts.environment=makeEnv(tr);addLights(ts);
+  const tc=new THREE.PerspectiveCamera(28,1,.1,50);
+  const plateGeo=lathe([[0,-.05],[1.25,-.05],[1.32,0],[1.25,.02],[0,.015]]);
+  for(const id of ['pist','choc','velvet','bento','blue','macs','berries']){
+    const g=BUILD[id]();ts.add(g);
+    let plate=null;
+    if(id!=='macs'&&id!=='berries'){plate=new THREE.Mesh(plateGeo,mats.plate);plate.scale.setScalar(id==='bento'?.82:1.02);ts.add(plate)}
+    const box=new THREE.Box3().setFromObject(g),ctr=box.getCenter(new THREE.Vector3()),sz=box.getSize(new THREE.Vector3());
+    const dist=Math.max(sz.x,sz.y*1.25)*2.1;
+    tc.position.set(0,ctr.y+dist*(id==='berries'?.75:.42),dist);tc.lookAt(0,ctr.y-sz.y*.08,0);
+    tr.render(ts,tc);pics[id]=tr.domElement.toDataURL('image/png');
+    ts.remove(g);if(plate)ts.remove(plate);
+  }
+  tr.dispose();tr.forceContextLoss&&tr.forceContextLoss();
+
+  /* Живая сцена в первом экране */
+  const stage=$('stage');
+  const R=new THREE.WebGLRenderer({antialias:true,alpha:true});setup(R);R.setPixelRatio(Math.min(devicePixelRatio,2));
+  stage.appendChild(R.domElement);
+  const S=new THREE.Scene();S.environment=makeEnv(R);addLights(S);
+  const cam=new THREE.PerspectiveCamera(30,1,.1,60);
+  const hero=new THREE.Group();S.add(hero);
+  const spin=new THREE.Group();spin.add(BUILD.blue());hero.add(spin);
+  const floats=[];
+  const addF=(o,x,y,z)=>{o.position.set(x,y,z);o.userData={y,p:rnd(0,6.28),s:rnd(.6,1.1),rx:rnd(-.6,.6),ry:rnd(-.8,.8)};hero.add(o);floats.push(o)};
+  [[-2.1,1.9,.3],[2.2,2.2,-.4],[-1.5,2.8,-1],[1.4,2.9,.6],[2.9,1.2,-.8],[-2.9,1.1,-.6],[.5,3.3,-1.4],[-.7,3.1,.8]].forEach(([x,y,z])=>addF(blue(rnd(.13,.18)),x,y,z));
+  [[-2.5,.4,.9],[2.6,.3,.7],[1.9,3.0,-1.2]].forEach(([x,y,z])=>addF(rasp(rnd(.13,.16)),x,y,z));
+  for(let i=0;i<6;i++){const l=leaf();l.scale.setScalar(1.5);addF(l,rnd(-3,3),rnd(1,3.3),rnd(-1.4,1))}
+
+  let mob=false,mx=0,my=0,cx=0,cy=0;
+  function size(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;mob=w<700;R.setSize(w,h,false);cam.aspect=w/h;
+    hero.scale.setScalar(mob?.98:1.28);hero.position.set(0,mob?-.82:-.92,0);cam.fov=mob?43:34;cam.updateProjectionMatrix()}
+  addEventListener('resize',size);size();
+  addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
+  let vis=true;new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis&&!reduce)requestAnimationFrame(loop)}).observe(stage);
+  function draw(t){
+    cx+=(mx-cx)*.05;cy+=(my-cy)*.05;
+    cam.position.set(cx*.8,2.45-cy*.35,9.8);cam.lookAt(0,.82,0);
+    spin.rotation.y=t*.0002;
+    for(const o of floats){const u=o.userData;o.position.y=u.y+Math.sin(t*.0009*u.s+u.p)*.14;o.rotation.x+=u.rx*.004;o.rotation.y+=u.ry*.004}
+    R.render(S,cam);
+  }
+  function loop(t){if(!vis)return;draw(t);requestAnimationFrame(loop)}
+  if(reduce)draw(0);else requestAnimationFrame(loop);
+}catch(e){console.warn(e)}}
+
+/* ---------- Ассортимент ---------- */
+const fallback=t=>"data:image/svg+xml,"+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><ellipse cx='50' cy='72' rx='34' ry='8' fill='#fff'/><rect x='24' y='38' width='52' height='32' rx='6' fill='#F4EEE6' stroke='#B5683D'/></svg>`);
+const img=id=>pics[id]||fallback();
+const priceTxt=c=>c.fixed?rub(c.fixed):'от '+rub(c.kg)+' / кг';
+$('track').innerHTML=CAKES.map(c=>`<button class="card" type="button" data-go="${c.id}" style="--tint:${c.tint}">
+  <div class="pic"><img src="${img(c.id)}" alt="${c.name}"></div>
+  <div class="lab"><b>${c.name}</b><span>${priceTxt(c)}</span></div></button>`).join('');
+$('m1').src=img('macs');$('m2').src=img('choc');$('m3').src=img('berries');$('berriesDeco').src=img('berries');
+const track=$('track');
+const pages=()=>track.clientWidth?Math.min(8,Math.max(1,Math.round(track.scrollWidth/track.clientWidth))):1;
+function drawDots(){const n=pages(),cur=Math.round(track.scrollLeft/Math.max(1,track.scrollWidth-track.clientWidth)*(n-1))||0;
+  $('dots').innerHTML=Array.from({length:n},(_,i)=>`<i class="${i===cur?'on':''}"></i>`).join('')}
+track.addEventListener('scroll',drawDots,{passive:true});addEventListener('resize',drawDots);drawDots();
+$('prev').onclick=()=>track.scrollBy({left:-track.clientWidth*.8,behavior:reduce?'auto':'smooth'});
+$('next').onclick=()=>track.scrollBy({left:track.clientWidth*.8,behavior:reduce?'auto':'smooth'});
+
+/* ---------- Конструктор заказа ---------- */
+$('pick').innerHTML=CAKES.map((c,i)=>`<input type="radio" name="cake" id="c-${c.id}" value="${c.id}"${i===0?' checked':''}><label for="c-${c.id}"><span class="p" style="--tint:${c.tint}"><img src="${img(c.id)}" alt=""></span>${c.name}</label>`).join('');
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const now=new Date(),min=new Date(now),def=new Date(now);min.setDate(min.getDate()+2);def.setDate(def.getDate()+5);
+$('date').min=iso(min);$('date').value=iso(def);
+const cur=()=>CAKES.find(c=>c.id===document.querySelector('[name=cake]:checked').value);
+const kgTxt=k=>String(k).replace('.',',');
+function fillSizes(){const c=cur();
+  $('size').innerHTML=c.sizes.map(k=>`<option value="${k}">${k<1?'500 г · на 2–3 человек':kgTxt(k)+' кг · на '+Math.round(k*5)+'–'+Math.round(k*6.5)+' человек'}</option>`).join('');
+  if(c.sizes.length>1)$('size').selectedIndex=1}
+function calc(){const c=cur(),k=+$('size').value;let s=c.fixed||Math.round(c.kg*k);
+  const ex=[...document.querySelectorAll('.extras input:checked')];ex.forEach(x=>s+=+x.dataset.p);return{c,k,s,ex}}
+function render(){
+  const {c,k,s,ex}=calc();
+  $('sum').textContent=rub(s);$('pre').textContent='предоплата '+rub(Math.round(s/2));
+  let d='дата не выбрана';if($('date').value){const [y,m,dd]=$('date').value.split('-').map(Number);d=new Date(y,m-1,dd).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'})}
+  const t=$('text').value.trim();
+  $('bubble').textContent='🎂 Новый заказ №1047\n\n'+c.name+', '+(k<1?'500 г':kgTxt(k)+' кг')+'\nК дню: '+d+(t?'\nНадпись: «'+t+'»':'')+
+    (ex.length?'\nДобавить: '+ex.map(x=>x.dataset.n).join(', '):'')+'\n\nСумма: '+rub(s)+'\nПредоплата: '+rub(Math.round(s/2))+
+    '\n\n'+($('who').value.trim()||'Покупатель')+', '+($('phone').value.trim()||'телефон не указан');
+  const tm=document.createElement('span');tm.className='time';const n=new Date();tm.textContent=pad(n.getHours())+':'+pad(n.getMinutes());$('bubble').appendChild(tm);
+}
+function showForm(){$('form').hidden=false;$('done').hidden=true}
+document.querySelectorAll('[name=cake]').forEach(r=>r.addEventListener('change',()=>{fillSizes();render()}));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{$('c-'+b.dataset.go).checked=true;fillSizes();render();showForm();$('order').scrollIntoView({behavior:reduce?'auto':'smooth'})}));
+$('form').addEventListener('input',render);$('form').addEventListener('change',render);
+$('form').addEventListener('submit',e=>{e.preventDefault();if(!$('form').reportValidity())return;$('form').hidden=true;$('done').hidden=false});
+$('again').addEventListener('click',showForm);
+fillSizes();render();
+
+/* ---------- Номера разделов ---------- */
+const ids=['top','assort','about','order','how'];
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){
+  document.querySelectorAll('#menu a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id))}}),{rootMargin:'-45% 0px -50% 0px'});
+ids.forEach(id=>io.observe($(id)));
+
+/* ---------- Название кондитерской ---------- */
+function setBrand(v){v=(v||'').trim()||'Ваниль';
+  document.querySelectorAll('[data-brand]').forEach(e=>e.textContent=v);
+  document.querySelectorAll('[data-initial]').forEach(e=>e.textContent=v[0].toUpperCase());
+  document.title=v+', кондитерская студия';
+}
+setBrand('Ваниль');
+</script>
